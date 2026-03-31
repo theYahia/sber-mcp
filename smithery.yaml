@@ -1,0 +1,33 @@
+name: sber-mcp
+description: MCP server for Sberbank API — accounts, balance, transactions, payments. Bearer or OAuth auth.
+icon: bank
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      SBER_TOKEN:
+        type: string
+        title: Sber Bearer Token
+        description: Direct API token (alternative to OAuth)
+      SBER_CLIENT_ID:
+        type: string
+        title: OAuth Client ID
+        description: Sber OAuth client_id (use with CLIENT_SECRET)
+      SBER_CLIENT_SECRET:
+        type: string
+        title: OAuth Client Secret
+        description: Sber OAuth client_secret (use with CLIENT_ID)
+    oneOf:
+      - required: [SBER_TOKEN]
+      - required: [SBER_CLIENT_ID, SBER_CLIENT_SECRET]
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['dist/index.js'],
+      env: {
+        ...(config.SBER_TOKEN ? { SBER_TOKEN: config.SBER_TOKEN } : {}),
+        ...(config.SBER_CLIENT_ID ? { SBER_CLIENT_ID: config.SBER_CLIENT_ID } : {}),
+        ...(config.SBER_CLIENT_SECRET ? { SBER_CLIENT_SECRET: config.SBER_CLIENT_SECRET } : {}),
+      }
+    })
