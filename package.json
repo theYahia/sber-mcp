@@ -1,14 +1,15 @@
 {
   "name": "@theyahia/sber-mcp",
-  "version": "1.1.1",
-  "description": "MCP server for Sberbank — business accounts, statements, transfers (Russia)",
+  "version": "1.1.0",
+  "description": "MCP server for Sberbank API — accounts, balance, transactions, payments. Bearer or OAuth auth.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
     "sber-mcp": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "smithery.yaml"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -17,7 +18,10 @@
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "prepublishOnly": "npm run build"
+    "start:http": "node dist/index.js --http",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
@@ -26,7 +30,8 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2"
   },
   "publishConfig": {
     "access": "public"
@@ -43,8 +48,8 @@
     "sber",
     "banking",
     "accounts",
-    "api",
-    "typescript"
+    "payments",
+    "transactions"
   ],
   "license": "MIT",
   "repository": {
