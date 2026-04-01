@@ -1,12 +1,18 @@
 {
   "name": "@theyahia/sber-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for Sberbank API — accounts, statements. Bearer token auth.",
+  "version": "1.1.1",
+  "description": "MCP server for Sberbank — business accounts, statements, transfers (Russia)",
   "type": "module",
   "main": "dist/index.js",
-  "bin": { "sber-mcp": "dist/index.js" },
-  "files": ["dist"],
-  "engines": { "node": ">=18.0.0" },
+  "bin": {
+    "sber-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
@@ -22,11 +28,29 @@
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "mcpName": "io.github.theYahia/sber-mcp",
-  "keywords": ["mcp", "mcp-server", "model-context-protocol", "claude", "ai", "russian-api", "sberbank", "sber", "banking", "accounts"],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "russian-api",
+    "sberbank",
+    "sber",
+    "banking",
+    "accounts",
+    "api",
+    "typescript"
+  ],
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/theYahia/sber-mcp.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theYahia/sber-mcp.git"
+  },
   "homepage": "https://github.com/theYahia/sber-mcp#readme",
   "author": "theYahia (https://github.com/theYahia)"
 }
