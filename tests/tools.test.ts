@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { readFileSync } from "node:fs";
 
 // Mock fetch globally before imports
 const mockFetch = vi.fn();
@@ -165,10 +166,134 @@ describe("client auth", () => {
   });
 });
 
+describe("idempotency (RqUID)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("create_payment sends x-Introspect-RqUID + body rq_uid, reused across retries", async () => {
+    const { handleCreatePayment } = await import("../src/tools/payments.js");
+
+    // First attempt fails with 5xx (retried), second succeeds.
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 503, statusText: "Service Unavailable" })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ paymentId: "pay-1", status: "CREATED" }),
+      });
+
+    const result = await handleCreatePayment({
+      payer_account: "40817",
+      payee_account: "40702",
+      payee_name: "ООО Тест",
+      payee_bank_bic: "044525225",
+      amount: 15000,
+      currency: "RUB",
+      purpose: "Оплата по договору",
+    });
+
+    expect(JSON.parse(result).paymentId).toBe("pay-1");
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+
+    const h0 = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+    const h1 = mockFetch.mock.calls[1][1].headers as Record<string, string>;
+    expect(h0["x-Introspect-RqUID"]).toMatch(/^[0-9a-f]{32}$/);
+    // The SAME key is reused on the retry — otherwise Sber would create a duplicate payment.
+    expect(h1["x-Introspect-RqUID"]).toBe(h0["x-Introspect-RqUID"]);
+
+    // Body carries rq_uid matching the header.
+    const body0 = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    expect(body0.rq_uid).toBe(h0["x-Introspect-RqUID"]);
+  });
+
+  it("GET requests carry no RqUID", async () => {
+    const { handleGetAccounts } = await import("../src/tools/accounts.js");
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ accounts: [] }) });
+    await handleGetAccounts();
+    const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+    expect(headers["x-Introspect-RqUID"]).toBeUndefined();
+  });
+});
+
+describe("summarize_transactions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("aggregates income/expense/net/count", async () => {
+    const { handleSummarizeTransactions } = await import("../src/tools/transactions.js");
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        transactions: [
+          { id: "1", date: "2026-05-02", amount: 1000, currency: "RUB", type: "credit" },
+          { id: "2", date: "2026-05-03", amount: -300, currency: "RUB", type: "debit" },
+          { id: "3", date: "2026-05-04", amount: -200, currency: "RUB", type: "debit" },
+        ],
+        account: "acc-1",
+        dateFrom: "2026-05-01",
+        dateTo: "2026-05-31",
+      }),
+    });
+
+    const parsed = JSON.parse(
+      await handleSummarizeTransactions({ account_id: "acc-1" }),
+    );
+    expect(parsed.count).toBe(3);
+    expect(parsed.totalIncome).toBe(1000);
+    expect(parsed.totalExpense).toBe(500);
+    expect(parsed.net).toBe(500);
+    expect(parsed.currency).toBe("RUB");
+  });
+});
+
+describe("statement pagination", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("get_statement adds page param when provided", async () => {
+    const { handleGetStatement } = await import("../src/tools/transactions.js");
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ transactions: [] }) });
+    await handleGetStatement({ account_id: "acc-1", page: 2 });
+    expect(mockFetch.mock.calls[0][0] as string).toContain("page=2");
+  });
+});
+
+describe("counterparties & company tools", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("list_counterparties calls the counterparties endpoint", async () => {
+    const { handleListCounterparties } = await import("../src/tools/counterparties.js");
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ counterparties: [] }) });
+    await handleListCounterparties();
+    expect(mockFetch.mock.calls[0][0] as string).toContain("/fintech/v1/counterparties");
+  });
+
+  it("get_company_info calls the client-info endpoint", async () => {
+    const { handleGetCompanyInfo } = await import("../src/tools/company.js");
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ inn: "7700000000" }) });
+    await handleGetCompanyInfo();
+    expect(mockFetch.mock.calls[0][0] as string).toContain("/fintech/v1/client-info");
+  });
+});
+
 describe("MCP server", () => {
-  it("createMcpServer registers 5 tools", async () => {
-    const { createMcpServer } = await import("../src/index.js");
+  it("createMcpServer registers 8 tools and exposes TOOL_COUNT", async () => {
+    const { createMcpServer, TOOL_COUNT } = await import("../src/index.js");
+    expect(TOOL_COUNT).toBe(8);
     const server = createMcpServer();
     expect(server).toBeDefined();
+  });
+
+  it("VERSION is single-sourced from package.json", async () => {
+    const { VERSION } = await import("../src/index.js");
+    const pkg = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ) as { version: string };
+    expect(VERSION).toBe(pkg.version);
   });
 });
