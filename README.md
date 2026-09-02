@@ -7,7 +7,7 @@ MCP-сервер для бизнес-API Сбербанка — счета, ба
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![smithery badge](https://smithery.ai/badge/@theyahia/sber-mcp)](https://smithery.ai/server/@theyahia/sber-mcp)
 
-Часть серии [Russian API MCP](https://github.com/theYahia/russian-mcp) от [@theYahia](https://github.com/theYahia).
+Часть серии [WWmcp](https://github.com/theYahia/WWmcp) от [@theYahia](https://github.com/theYahia).
 
 ## Быстрый старт
 
@@ -159,4 +159,8 @@ PORT=3000 npx -y @theyahia/sber-mcp --http
 
 ## Лицензия
 
-MIT — часть серии [Russian API MCP](https://github.com/theYahia/russian-mcp).
+MIT — часть серии [WWmcp](https://github.com/theYahia/WWmcp).
+
+---
+
+Часть [WWmcp](https://github.com/theYahia/WWmcp) · Telegram: [@vhodvai](https://t.me/vhodvai)
