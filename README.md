@@ -1,6 +1,6 @@
-# @theyahia/sber-mcp
+# MCP-сервер для бизнес-API Сбербанка — счета, выписки и платежи через ИИ
 
-MCP-сервер для бизнес-API Сбербанка — счета, баланс, выписки, платежи, контрагенты. **8 инструментов.**
+Если вы искали, как подключить СберБизнес API к нейросети, посмотреть баланс и выписку по расчётному счёту или собрать платёж не открывая интернет-банк — это оно. 8 инструментов: счета, баланс, выписки, платежи, контрагенты. Спрашиваете «сколько пришло на счёт за неделю» — получаете сумму и список поступлений.
 
 [![npm](https://img.shields.io/npm/v/@theyahia/sber-mcp)](https://www.npmjs.com/package/@theyahia/sber-mcp)
 [![CI](https://github.com/theYahia/sber-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/theYahia/sber-mcp/actions/workflows/ci.yml)
