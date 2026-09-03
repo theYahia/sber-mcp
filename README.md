@@ -150,8 +150,8 @@ PORT=3000 npx -y @theyahia/sber-mcp --http
 
 Боевой СберБизнес API закрыт за **mTLS и заявкой в банк**, поэтому реализация **не проверена
 против живого окружения**. Дефолты хостов, путей и scope соответствуют официальной документации
-([developers.sber.ru/docs/ru/sberbusinessapi](https://developers.sber.ru/docs/ru/sberbusinessapi),
-[developer.sberbank.ru](https://developer.sberbank.ru)) на дату ресёрча, но **точные пути
+([developers.sber.ru/docs/ru/sber-api](https://developers.sber.ru/docs/ru/sber-api/overview),
+[developers.sber.ru](https://developers.sber.ru/)) на дату ресёрча, но **точные пути
 эндпоинтов и имена параметров сверяйте с вашим интеграционным договором** — у Сбера сосуществуют
 поколения API (v2 direct / v3 partners). Все хосты переопределяются через `SBER_BASE_URL`,
 `SBER_OAUTH_URL`, `SBER_OAUTH_SCOPE`. Пометки `VERIFY` в исходниках указывают на места,
